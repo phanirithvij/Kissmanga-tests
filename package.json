@@ -1,0 +1,26 @@
+{
+  "name": "kissmanga-tests",
+  "version": "1.0.0",
+  "description": "Kissmanga-scarper",
+  "main": "index.js",
+  "dependencies": {
+    "crypto-js": "^3.1.9-1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phanirithvij/Kissmanga-tests.git"
+  },
+  "keywords": [
+    "kissmanga"
+  ],
+  "author": "Phani Rithvij",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/phanirithvij/Kissmanga-tests/issues"
+  },
+  "homepage": "https://github.com/phanirithvij/Kissmanga-tests#readme"
+}
