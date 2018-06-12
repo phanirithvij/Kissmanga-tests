@@ -1,6 +1,13 @@
-import cfscrape
+#!/usr/bin/env python3
+# file : kiss-withprogressV2.py
+
+import cfscrape #Only py3
+
 from bs4 import BeautifulSoup as soup
-import sys, time
+import sys, time, re, os, json, ast
+
+import subprocess
+
 from multiprocessing import Process
 
 def scrape_get():
