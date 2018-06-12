@@ -113,6 +113,62 @@ def get_img_urls(chapter_url, scraper):
 
     return imgs_lists[0]
 
+def get_chapter_detalis(chapter_url, scraper):
+    """
+    Returns chapter details of a particular chapter
+
+    {
+        title,
+        chapter_no,
+        date
+    }
+    """
+    chapter_no = None
+    title = ""
+    date = ""
+    
+    manga_link = "/".join(chapter_url.split("/")[:5])
+    html_text = scraper.get(manga_link).content
+    souped_html = soup(html_text,"lxml")
+
+
+    table = souped_html.find("table",{"class":"listing"})
+    links = table.findAll("tr")
+
+
+    json_data = []
+
+    index = 1
+
+    for link in links:
+        cells = link.findAll("td")
+        if not cells:
+            continue
+
+        a_tag = cells[0].find("a")
+
+        url_chapter = "http://kissmanga.com" + a_tag["href"]
+
+        json_data.append({
+            "title": re.sub('[^\w\s-]', '', a_tag.get_text().strip().replace(':', " -")),
+            "link": url_chapter,
+            "date": cells[1].get_text(),
+            "pos":index
+        })
+        index += 1
+
+    for chapter in json_data:
+        if chapter['link'] == chapter_url:
+            title = chapter['title']
+            chapter_no = index - chapter['pos']
+            date = chapter['date']
+
+    return {
+            "title" : title,
+            "chapter_no" : chapter_no,
+            "date": date    
+    }
+
 if __name__ == "__main__":
     urls = ["http://kissmanga.com/Manga/Gintama/Lesson-627?id=357852",
             "http://kissmanga.com/Manga/Gintama/Lesson-625?id=348047",
