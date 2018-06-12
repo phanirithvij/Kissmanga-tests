@@ -7,17 +7,30 @@ from bs4 import BeautifulSoup as soup
 import sys, re, os, ast
 import subprocess
 
-def scrape_get_scripts(urls = []):
+
+def create_scraper_new(requests):
+    """
+    Returns a new scraper instance
+    """
+    session = requests.session()
+    scraper = cfscrape.create_scraper(sess=session)
+
+    return scraper
+
+
+def scrape_get_scripts(scraper, urls = []):
     """
     Returns script lists from the webpages of all urls given
     
     First url takes 10 seconds and others will be immediate
-    """
-    #The advantage is to use the same cfscrape instance to get all the urls
-    #It would be useless if we have to wait for 10 secs for every link
+
+    scraper is passed because:
     
-    session = requests.session()
-    scraper = cfscrape.create_scraper(sess=session)
+    The advantage is to use the same cfscrape instance to get all the urls
+    It would be useless if we have to wait for 10 secs for every link
+    
+    """
+
     scripts = []
     for url in urls:
         print(url)
@@ -28,7 +41,7 @@ def scrape_get_scripts(urls = []):
 
 
 
-def get_ecrypted_links(sc_lists):
+def get_encrypted_links(sc_lists):
     """
     Returns encrypted img-link lists from given script lists
 
@@ -99,9 +112,12 @@ if __name__ == "__main__":
             "http://kissmanga.com/Manga/One-Piece/885---It-s-Brulee-?id=390134"]
 
     print("Wait for 10 secs ...")
-    sc_lists = scrape_get_scripts(urls)
 
-    enc_lists = get_ecrypted_links(sc_lists)
+    scraper = create_scraper_new(requests)
+
+    sc_lists = scrape_get_scripts(scraper, urls=urls)
+
+    enc_lists = get_encrypted_links(sc_lists)
 
     img_link_lists = get_decrypted_imgs(enc_lists)
 
