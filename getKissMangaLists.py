@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # file : getKissManagList.py
 
-import cfscrape
+import cfscrape, re
 import requests
 from bs4 import BeautifulSoup as soup
-
 
 base_url = "http://kissmanga.com"
 
@@ -23,7 +22,9 @@ def getchmn(url, scraper):
     """
     Name : get_chapters_of_manga
 
-    Returns the chapter links array for given valid url of the manga
+    Usage: return_value[0] contains the list 
+
+    Returns the chapter links list and a json data for given valid url of the manga
 
     eg:
         http://kissmanga.com/Sins
@@ -42,10 +43,19 @@ def getchmn(url, scraper):
 
     ch_links = []
 
+    data_for_json = []
+
     for link in links:
-        ch_links.append(base_url + link["href"])
-        
-    return ch_links
+
+        url_chapter = base_url + link["href"]
+        ch_links.append(url_chapter)
+
+        data_for_json.append({
+            "chapter": re.sub('[^\w\s-]', '', link.get_text().strip().replace(':', " -")),
+            "link": url_chapter
+        })
+    
+    return (ch_links, data_for_json)
 
 def getchchlnk(ch_url, scraper):
     """
@@ -73,6 +83,6 @@ if __name__ == "__main__":
 
     url = "http://kissmanga.com/Manga/One-Piece/Chapter-906--The-Holy-Land-Mary-Geoise?id=422953"
 
-    list_chapters = getchchlnk(url, scraper)
+    list_chapters, data = getchchlnk(url, scraper)
 
     print(list_chapters)

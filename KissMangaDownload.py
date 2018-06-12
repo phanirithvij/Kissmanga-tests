@@ -3,8 +3,8 @@
 
 import cfscrape
 import requests
-import kissV2, getKissMangaLists
-import argparse
+import kissV2, getKissMangaLists, downloadManga
+import argparse, json, os
 
 #Scraper instance
 session = requests.session()
@@ -17,23 +17,29 @@ parser.add_argument("-cl", "--chapterlink", dest="chapter_link", help="Chapter L
 parser.add_argument("-ml", "--mangalink", dest="manga_link", help="Manga Link")
 parser.add_argument("-m", "--manga", dest="manga_name", help="Manga Name")
 parser.add_argument("-a", "--all", dest="all", default=False, help="Use -a True to download all chapters", type=bool)
+parser.add_argument("-d", "--dir", dest="directory", default="Downloads", help="Use -d path to change download path default is ./Downloads")
+parser.add_argument("-s", "--start", dest="start", default=0,help="Use -s chapter.no to start from chapter.no")
+parser.add_argument("-e", "--end", dest="end",help="Use -e chapter.no to end at chapter.no")
 
 args = parser.parse_args()
 
-manga_link = None
-chapter_link = None
+manga_link = args.manga_link
+manga_name = args.manga_name
+chapter_link = args.chapter_link
 download_all = args.all
+outdir = args.directory
 
 if args.manga_name:
     manga_link = "http://kissmanga.com/Manga/" + args.manga_name
 
 if args.manga_link:
-    manga_link = args.manga_link
+    manga_name = manga_link.split("/")[-1]
 
 if args.chapter_link:
-    chapter_link = args.chapter_link
+    manga_link = "/".join(chapter_link.split("/")[:5])
+    manga_name = manga_link.split("/")[-1]
 
-
+outdir = os.path.join(outdir, manga_name)
 
 if manga_link and download_all:
     
@@ -43,12 +49,26 @@ if manga_link and download_all:
     print("Wait for 10 secs.. to bypass cloudflare ddos protection..")
     print("Downloading all chapters from " + manga_link + " ...")
 
-    list_chapters = getKissMangaLists.getchmn(manga_link, scraper)
-    sc_lists = kissV2.scrape_get_scripts(scraper, urls=list_chapters)
-    enc_lists = kissV2.get_encrypted_links(sc_lists)
-    dec_imgs_lists = kissV2.get_decrypted_imgs(enc_lists)
+    list_chapters, json_data = getKissMangaLists.getchmn(manga_link, scraper)
+    
+    downloadManga.write_json(json_data, outdir, 'chapters')
 
-    print(dec_imgs_lists)
+    for chapter in json_data:
+        images = kissV2.get_img_urls(chapter['link'], scraper)
+        
+        file_name="%s_%s" % (chapter['chapter'], 'images')
+       
+        downloadManga.write_json(
+            images,
+            os.path.join(outdir, chapter['chapter']),
+            file_name
+        )
+        
+        downloadManga.download_images_and_create_pdf(
+            images,
+            os.path.join(outdir, chapter['chapter']),
+            chapter['chapter']
+        )
 
 elif manga_link and not download_all:
     print("It currently supports downloading all chapters or only one chapter")
@@ -61,12 +81,27 @@ if chapter_link and download_all and not manga_link:
     print("Wait for 10 secs.. to bypass cloudflare ddos protection..")
     print("Downloading all chapters ....")
 
-    list_chapters = getKissMangaLists.getchchlnk(chapter_link, scraper)
-    sc_lists = kissV2.scrape_get_scripts(scraper, urls=list_chapters)
-    enc_lists = kissV2.get_encrypted_links(sc_lists)
-    dec_imgs_lists = kissV2.get_decrypted_imgs(enc_lists)
+    list_chapters, json_data = getKissMangaLists.getchchlnk(chapter_link, scraper)
 
-    print(dec_imgs_lists)
+    downloadManga.write_json(json_data, outdir, 'chapters')
+
+    for chapter in json_data:
+        images = kissV2.get_img_urls(chapter['link'], scraper)
+        
+        file_name="%s_%s" % (chapter['chapter'], 'images')
+        
+
+        downloadManga.write_json(
+            images,
+            os.path.join(outdir, chapter['chapter']),
+            file_name
+        )
+
+        downloadManga.download_images_and_create_pdf(
+            images,
+            os.path.join(outdir, chapter['chapter']),
+            chapter['chapter']
+        )
 
 elif chapter_link and not download_all and not manga_link:
     
@@ -75,9 +110,6 @@ elif chapter_link and not download_all and not manga_link:
     print("Wait for 10 secs.. to bypass cloudflare ddos protection..")
     print("Downloading only this chapter " + chapter_link + " ...")
 
-    list_chapters = [chapter_link]
-    sc_lists = kissV2.scrape_get_scripts(scraper, urls=list_chapters)
-    enc_lists = kissV2.get_encrypted_links(sc_lists)
-    dec_imgs_lists = kissV2.get_decrypted_imgs(enc_lists)
+    dec_imgs_lists = kissV2.get_img_urls(chapter_link, scraper)
 
     print(dec_imgs_lists)

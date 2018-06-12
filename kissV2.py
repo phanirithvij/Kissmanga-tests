@@ -102,6 +102,17 @@ def get_decrypted_imgs(enc_lists):
 
     return list_imgs
 
+def get_img_urls(chapter_url, scraper):
+    """
+    Returns list of images of a chapter
+    """
+
+    list_scripts = scrape_get_scripts(scraper, urls=[chapter_url])
+    enc_lists = get_encrypted_links(list_scripts)
+    imgs_lists = get_decrypted_imgs(enc_lists)
+
+    return imgs_lists[0]
+
 if __name__ == "__main__":
     urls = ["http://kissmanga.com/Manga/Gintama/Lesson-627?id=357852",
             "http://kissmanga.com/Manga/Gintama/Lesson-625?id=348047",
@@ -115,10 +126,6 @@ if __name__ == "__main__":
 
     scraper = create_scraper_new(requests)
 
-    sc_lists = scrape_get_scripts(scraper, urls=urls)
-
-    enc_lists = get_encrypted_links(sc_lists)
-
-    img_link_lists = get_decrypted_imgs(enc_lists)
-
-    print(img_link_lists)
+    for url in urls:
+        a = get_img_urls(url, scraper)
+        print(a)
