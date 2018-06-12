@@ -31,6 +31,8 @@ def scrape_get_scripts(urls = []):
 def get_ecrypted_links(sc_lists):
     """
     Returns encrypted img-link lists from given script lists
+
+    Uses python re module
     """
     
     #I'm accessing the 11th element from scripts list from beautifulsoup
@@ -54,6 +56,8 @@ def get_decrypted_imgs(enc_lists):
     
     """
     Returns the decrypted lists of image-links for given ecrypted-lists (enc_lists)
+
+    Uses node js and index.js must exist in the current directory
     """
     
     list_imgs = []
