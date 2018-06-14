@@ -19,7 +19,7 @@ parser.add_argument("-cl", "--chapterlink", dest="chapter_link", default="", hel
 parser.add_argument("-ml", "--mangalink", dest="manga_link", default="", help="Manga Link")
 parser.add_argument("-m", "--manga", dest="manga_name", default="", help="Manga Name")
 parser.add_argument("-a", "--all", dest="all", nargs='?', const=True, help="Use -a or --all to download all chapters", type=bool)
-parser.add_argument("-d", "--dir", dest="directory", default="Downloads", help="Use -d path to change download path default is ./Downloads")
+parser.add_argument("-d", "--dir", dest="directory", default="Manga", help="Use -d path to change download path default is ./Manga")
 parser.add_argument("-s", "--start", dest="start", default=0,help="Use -s chapter.no to start from chapter.no")
 parser.add_argument("-e", "--end", dest="end", help="Use -e chapter.no to end at chapter.no")
 parser.add_argument("-l", "--list", dest="list_chapters", nargs='?', const=True, help="Lists chapter names", type=bool)
